@@ -10,7 +10,8 @@ import java.util.List;
 /**
  * @Author 作者：mazhuang
  * @Date 创建时间：2020/12/21 11:53
- * @Description 文件描述：
+ * @Description 文件描述：中间处理类
+ *
  */
 public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TTSAudioPlayerProcessor.TTSAudioPlayerListener , TTSTextProcessor.TTSTextProcessorListener {
     private TTSHttpProcessor ttsHttpProcessor;
