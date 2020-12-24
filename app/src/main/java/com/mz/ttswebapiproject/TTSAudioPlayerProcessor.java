@@ -34,7 +34,7 @@ public class TTSAudioPlayerProcessor {
         tempMediaPlayer = currentMediaPlayer;
     }
     public void startPlay(final int index, final File targetFile) {
-        LogUtil.play("开始播放第" + index + "个");
+        LogUtil.e("开始播放第" + index + "个");
         if(tempMediaPlayer == null){
             return;
         }
@@ -46,7 +46,7 @@ public class TTSAudioPlayerProcessor {
             tempMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    LogUtil.play("第" + index + "播放完");
+                    LogUtil.e("第" + index + "播放完");
                     tempMediaPlayer = mediaPlayerMap.get(mediaPlayer.toString());
                     for (TTSAudioPlayerListener audioPlayerListener : ttsAudioPlayerListenerList) {
                         if (audioPlayerListener != null) {

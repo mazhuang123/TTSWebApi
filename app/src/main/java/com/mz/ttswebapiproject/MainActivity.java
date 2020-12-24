@@ -7,6 +7,7 @@ import android.text.SpannableString;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 /**
@@ -20,7 +21,8 @@ import android.widget.TextView;
  * https://github.com/452896915/jieba-android
  *
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener , TTSContentProcessor.TTSContentProcessorListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        TTSContentProcessor.TTSContentProcessorListener,SeekBar.OnSeekBarChangeListener {
     private String content = "美国登月的旗子是就是普通尼龙做的," +
             "5.5美刀一面" +
             "而这个尼龙是聚酰胺纤维（锦纶）的一种说法。" +
@@ -54,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView contentView;
     private Button startBtn;
     private ProgressBar progressBar;
+    private SeekBar seekBar;
     TTSContentProcessor ttsContentProcessor;
-    private boolean isRequested;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +65,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         contentView = findViewById(R.id.content_view);
         progressBar = findViewById(R.id.tts_listen_book_progress_play_view);
         startBtn = findViewById(R.id.startBtn);
+        seekBar = findViewById(R.id.seek_bar);
         startBtn.setOnClickListener(this);
+        seekBar.setOnSeekBarChangeListener(this);
         contentView.setText(content);
         ttsContentProcessor = new TTSContentProcessor(this,content);
+        ttsContentProcessor.init();
+        ttsContentProcessor.addTTSContentProcessorListener(this);
     }
 
     @Override
@@ -74,18 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.startBtn:
                 if(ttsContentProcessor.contentProcessorIsPlaying()){
                     ttsContentProcessor.changePlayState(false);
-                    setPlayState(false,false);
-                    ttsContentProcessor.contentProcessorPause();
                 } else {
-                    if(!isRequested){
-                        setPlayState(true,true);
-                        ttsContentProcessor.addTTSContentProcessorListener(this);
-                        ttsContentProcessor.startTTSFromHttp(new AudioConfig(),0);
-                    } else {
-                        ttsContentProcessor.changePlayState(true);
-                        setPlayState(true,false);
-                        ttsContentProcessor.startPlay();
-                    }
+                    ttsContentProcessor.changePlayState(true);
                 }
                 break;
         }
@@ -116,9 +112,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    @Override
+    public void onTTSContentOperatorMediaPlayWait() {
+        setPlayState(true,true);
+    }
+
+    @Override
+    public void onTTSContentOperatorMediaPlayPause() {
+        setPlayState(false,false);
+    }
+
+    @Override
+    public void onTTSContentOperatorMediaPlayPlaying() {
+        setPlayState(true,false);
+    }
+
     @Override
     public void onTTSContentOperatorMediaPlayError(String errorInfo) {
-
+        setPlayState(false,true);
     }
 
     @Override
@@ -128,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onTTSContentOperatorHttpSuccess() {
-        isRequested = true;
     }
 
     @Override
@@ -143,5 +154,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 contentView.setText(spannableString);
             }
         });
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        ttsContentProcessor.updateReadProgress(seekBar.getProgress());
     }
 }

@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -24,11 +26,6 @@ import okhttp3.Response;
  * @Description 文件描述：
  */
 public class TTSHttpProcessor {
-    public TTSHttpListener ttsHttpListener;
-
-    public TTSHttpProcessor(TTSHttpListener ttsHttpListener) {
-        this.ttsHttpListener = ttsHttpListener;
-    }
 
     public void startPost(final AudioConfig audioConfig, final String requestContent, final int index) {
         LogUtil.httpLog("开始网络请求第 " + index);
@@ -53,7 +50,9 @@ public class TTSHttpProcessor {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                ttsHttpListener.onTTsHttpOperatorFail(requestContent, index, e.toString());
+                for(TTSHttpListener ttsHttpListener:ttsHttpListenerList){
+                    ttsHttpListener.onTTsHttpOperatorFail(requestContent, index, e.toString());
+                }
                 LogUtil.e(e.toString());
             }
 
@@ -61,15 +60,27 @@ public class TTSHttpProcessor {
             public void onResponse(Call call, Response response) throws IOException {
                 Headers headers = response.headers();
                 for (int i = 0; i < headers.size(); i++) {
-                    LogUtil.e(headers.name(i) + ":" + headers.value(i));
+//                    LogUtil.e(headers.name(i) + ":" + headers.value(i));
                 }
                 byte[] resultBytes = response.body().bytes();
                 LogUtil.httpLog("网络请求第 " + index + " 完成");
-                ttsHttpListener.onTTSHttpOperatorSuccess(requestContent, index, resultBytes);
+                for(TTSHttpListener ttsHttpListener:ttsHttpListenerList){
+                    ttsHttpListener.onTTSHttpOperatorSuccess(requestContent, index, resultBytes);
+                }
             }
         });
     }
-
+    private List<TTSHttpListener> ttsHttpListenerList = new ArrayList<>();
+    public void addTTSHttpListener(TTSHttpListener ttsHttpListener){
+        if(ttsHttpListenerList != null){
+            ttsHttpListenerList.add(ttsHttpListener);
+        }
+    }
+    public void removeTTSHttpListener(TTSHttpListener ttsHttpListener){
+        if(ttsHttpListenerList!= null && ttsHttpListenerList.size() > 0){
+            ttsHttpListenerList.remove(ttsHttpListener);
+        }
+    }
     public interface TTSHttpListener {
         void onTTSHttpOperatorSuccess(String requestContent, int index, byte[] resultBytes);
 

@@ -46,7 +46,9 @@ public class FileOperator {
         String filePath = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
         File targetFile = new File(filePath+"/localTTS"+index+".mp3");
         if(targetFile.exists()){
-            targetFile.delete();
+            cacheFileMap.put(index,targetFile);
+            return;
+//            targetFile.delete();
         }
         FileOutputStream fos = null;
         try {

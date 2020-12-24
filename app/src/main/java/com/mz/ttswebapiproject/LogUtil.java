@@ -8,7 +8,7 @@ import android.util.Log;
  * @Description 文件描述：
  */
 public class LogUtil {
-    public static final String TAG = "WEBAPI";
+    public static final String TAG = "common+++";
     public static void play(String message){
         Log.e("play+++", message);
     }
