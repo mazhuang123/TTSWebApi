@@ -29,7 +29,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         TTSContentProcessor.TTSContentProcessorListener,SeekBar.OnSeekBarChangeListener {
     private String content = "美国登月的旗子是就是普通尼龙做的," +
-            "5.5美刀一面" +
+            "5美刀一面" +
             "而这个尼龙是聚酰胺纤维（锦纶）的一种说法。" +
             "通俗的说," +
             "尼龙就是一种塑料。" +
@@ -94,9 +94,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         speakerListViewAdatper.setData(speakList);
         rateAdapter.setData(rateList);
         formatAdapter.setData(formatList);
+        speedSeekBar.setProgress(50);
         speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
 
             }
 
