@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 
 /**
  * @Author 作者：mazhuang
  * @Date 创建时间：2020/12/21 11:53
  * @Description 文件描述：https://vimsky.com/article/3303.html
+ * https://blog.csdn.net/qq_33642117/article/details/51841510
+ *
  */
 public class TTSAudioPlayerProcessor {
-    private TTSAudioPlayerListener audioPlayerListener;
     private MediaPlayer tempMediaPlayer;
     private Map<String, MediaPlayer> mediaPlayerMap = new HashMap<>();
     private List<TTSAudioPlayerListener> ttsAudioPlayerListenerList = new ArrayList<>();

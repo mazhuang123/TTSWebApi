@@ -5,10 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author 作者：mazhuang
@@ -56,8 +61,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView contentView;
     private Button startBtn;
     private ProgressBar progressBar;
-    private SeekBar seekBar;
+    private SeekBar seekBar,speedSeekBar;
+    private ListView speakerListView,rateListView,formatListView;
+    private ListViewAdatper speakerListViewAdatper,rateAdapter,formatAdapter;
     TTSContentProcessor ttsContentProcessor;
+    private List<String> speakList = new ArrayList<>();
+    private List<String> rateList = new ArrayList<>();
+    private List<String> formatList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,12 +76,103 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressBar = findViewById(R.id.tts_listen_book_progress_play_view);
         startBtn = findViewById(R.id.startBtn);
         seekBar = findViewById(R.id.seek_bar);
+        speedSeekBar = findViewById(R.id.speed_seek_bar);
+        speakerListView = findViewById(R.id.speaker_list_view);
+        rateListView = findViewById(R.id.rate_list_view);
+        formatListView = findViewById(R.id.format_list_view);
         startBtn.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(this);
+        initSpeakerList();
+        intRateList();
+        initFormatList();
+        speakerListViewAdatper = new ListViewAdatper();
+        rateAdapter = new ListViewAdatper();
+        formatAdapter = new ListViewAdatper();
+        speakerListView.setAdapter(speakerListViewAdatper);
+        rateListView.setAdapter(rateAdapter);
+        formatListView.setAdapter(formatAdapter);
+        speakerListViewAdatper.setData(speakList);
+        rateAdapter.setData(rateList);
+        formatAdapter.setData(formatList);
+        speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                LogUtil.e("此时的语速为："+seekBar.getProgress());
+                ttsContentProcessor.updateAudioConfigSpeed(seekBar.getProgress());
+            }
+        });
+        speakerListViewAdatper.addListViewContentListener(new ListViewAdatper.ListViewContentListener() {
+            @Override
+            public void onClickItem(int position) {
+                ttsContentProcessor.updateAudioConfigSpeaker(speakList.get(position));
+            }
+        });
+
+        rateAdapter.addListViewContentListener(new ListViewAdatper.ListViewContentListener() {
+            @Override
+            public void onClickItem(int position) {
+                String rate = "audio/L16;rate=8000";
+                if(position == 0){
+                    rate = "audio/L16;rate=8000";
+                } else if(position == 1){
+                    rate = "audio/L16;rate=16000";
+                }
+                ttsContentProcessor.updateAudioConfigRate(rate);
+            }
+        });
+        formatAdapter.addListViewContentListener(new ListViewAdatper.ListViewContentListener() {
+            @Override
+            public void onClickItem(int position) {
+                if(position == 0){
+                    ttsContentProcessor.updateAudioConfigFormat("raw");
+                } else if(position == 1){
+                    ttsContentProcessor.updateAudioConfigFormat("lame");
+                }
+            }
+        });
+
         contentView.setText(content);
         ttsContentProcessor = new TTSContentProcessor(this,content);
         ttsContentProcessor.init();
         ttsContentProcessor.addTTSContentProcessorListener(this);
+        speakerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ttsContentProcessor.updateAudioConfigSpeaker(speakList.get(i));
+            }
+        });
+        rateListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String rate = "audio/L16;rate=8000";
+                if(i == 0){
+                    rate = "audio/L16;rate=8000";
+                } else if(i == 1){
+                    rate = "audio/L16;rate=16000";
+                }
+                ttsContentProcessor.updateAudioConfigRate(rate);
+            }
+        });
+        formatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i == 0){
+                    ttsContentProcessor.updateAudioConfigFormat("raw");
+                } else if(i == 1){
+                    ttsContentProcessor.updateAudioConfigFormat("lame");
+                }
+            }
+        });
     }
 
     @Override
@@ -134,8 +235,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayComplete() {
-
+    public void onTTSContentOperatorMediaPlayComplete(int index,int sumSize) {
+        float progress = (index+1)*100/sumSize;
+        LogUtil.e("播放进度为："+progress);
+        seekBar.setProgress((int) progress);
     }
 
     @Override
@@ -167,5 +270,142 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         ttsContentProcessor.updateReadProgress(seekBar.getProgress());
+    }
+    private void intRateList(){
+        rateList.add("8K");
+        rateList.add("16k");
+    }
+    private void initFormatList(){
+        formatList.add("wav/pcm");
+        formatList.add("mp3");
+    }
+    private void initSpeakerList() {
+        speakList.add("aisbabyxu");
+        speakList.add("aisbaoma");
+        speakList.add("aisCatherine");
+        speakList.add("aisdalong");
+        speakList.add("aisduck");
+        speakList.add("aisjinger");
+        speakList.add("aisJohn");
+        speakList.add("aisLaoma");
+        speakList.add("aismengchun");
+        speakList.add("aismingma");
+        speakList.add("aisnn");
+        speakList.add("aisxa");
+        speakList.add("aisxa_angry");
+        speakList.add("aisxa_happy");
+        speakList.add("aisxa_neutral");
+        speakList.add("aisxa_sad");
+        speakList.add("aisxbao");
+        speakList.add("aisxbo");
+        speakList.add("aisxcao");
+        speakList.add("aisxcao_angry");
+        speakList.add("aisxcao_happy");
+        speakList.add("aisxcao_neutral");
+        speakList.add("aisxcao_sad");
+        speakList.add("aisxchun");
+        speakList.add("aisxgang");
+        speakList.add("aisxhui");
+        speakList.add("aisxiaoyu");
+        speakList.add("aisxjia");
+        speakList.add("aisxkun");
+        speakList.add("aisxlin");
+        speakList.add("aisxling");
+        speakList.add("aisxma");
+        speakList.add("aisxmei");
+        speakList.add("aisxmm");
+        speakList.add("aisxqian");
+        speakList.add("aisxqiang");
+        speakList.add("aisxrong");
+        speakList.add("aisxrui");
+        speakList.add("aisxshi");
+        speakList.add("aisxshi2");
+        speakList.add("aisxshi3");
+        speakList.add("aisxtong");
+        speakList.add("aisxwz");
+        speakList.add("aisxxin");
+        speakList.add("aisxxing");
+        speakList.add("aisxyan");
+        speakList.add("aisxyang");
+        speakList.add("aisxyao");
+        speakList.add("aisxying");
+        speakList.add("aisyfeng");
+        speakList.add("aisyping");
+        speakList.add("aiszl");
+        speakList.add("babyxu");
+        speakList.add("catherine");
+        speakList.add("dalong");
+        speakList.add("donaldduck");
+        speakList.add("fangliang");
+        speakList.add("henry");
+        speakList.add("jiajia");
+        speakList.add("jinger");
+        speakList.add("john");
+        speakList.add("laura");
+        speakList.add("nannan");
+        speakList.add("niyang");
+        speakList.add("robert");
+        speakList.add("vils");
+        speakList.add("vimary");
+        speakList.add("vixf");
+        speakList.add("vixy");
+        speakList.add("vixying");
+        speakList.add("wenqi");
+        speakList.add("xiaoai");
+        speakList.add("xiaobo");
+        speakList.add("xiaofeng");
+        speakList.add("xiaohong");
+        speakList.add("xiaohou");
+        speakList.add("xiaohui");
+        speakList.add("xiaojing");
+        speakList.add("xiaokun");
+        speakList.add("xiaolin");
+        speakList.add("xiaoma");
+        speakList.add("xiaomei");
+        speakList.add("xiaomeng");
+        speakList.add("xiaoqi");
+        speakList.add("xiaoqian");
+        speakList.add("xiaoqiang");
+        speakList.add("xiaorong");
+        speakList.add("xiaorui");
+        speakList.add("xiaoshi");
+        speakList.add("xiaowanzi");
+        speakList.add("xiaoxin");
+        speakList.add("xiaoyan");
+        speakList.add("xiaoyang");
+        speakList.add("xiaoyao");
+        speakList.add("xiaoyi");
+        speakList.add("xiaoyin");
+        speakList.add("xiaoyu");
+        speakList.add("yefang");
+        speakList.add("yufeng");
+        speakList.add("zhiling");
+        speakList.add("catherine");
+        speakList.add("henry");
+        speakList.add("jianzong");
+        speakList.add("xiaomei");
+        speakList.add("xiaoqi");
+        speakList.add("xiaoyan");
+        speakList.add("xiaoyu");
+        speakList.add("yufeng");
+        speakList.add("yufeng");
+        speakList.add("chuchu");
+        speakList.add("dahuilang");
+        speakList.add("geyou_Actor");
+        speakList.add("lichun_MG");
+        speakList.add("liying_Actor");
+        speakList.add("liyitong");
+        speakList.add("miguxiHappy");
+        speakList.add("sabeining");
+        speakList.add("sabeiningSJ");
+        speakList.add("wangguan_MG");
+        speakList.add("xiaoai_novel");
+        speakList.add("xiaoai_talking");
+        speakList.add("xiaobin_talking");
+        speakList.add("xiaohou");
+        speakList.add("xiaoxi");
+        speakList.add("yiping");
+        speakList.add("yuanye");
+
     }
 }

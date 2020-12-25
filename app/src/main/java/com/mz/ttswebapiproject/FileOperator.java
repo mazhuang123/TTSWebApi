@@ -17,6 +17,17 @@ import java.util.Map;
  */
 public class FileOperator {
     public  Map<Integer,File> cacheFileMap = new HashMap<>();
+    private  String AUDIO_PATH;
+    private File sumFile;
+
+    public FileOperator(Context context) {
+        AUDIO_PATH = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath()+"/TTSFile";
+        sumFile = new File(AUDIO_PATH);
+        if(!sumFile.exists()){
+            sumFile.mkdir();
+        }
+    }
+
     /**
      * 将文件存入到内存中
      * @param resultBytes
@@ -42,14 +53,15 @@ public class FileOperator {
      * @return
      * @throws IOException
      */
-    public void saveFileIntoLocal(Context context,int index,byte[] resultBytes) {
-        String filePath = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
-        File targetFile = new File(filePath+"/localTTS"+index+".mp3");
-        if(targetFile.exists()){
+    public void saveFileIntoLocal(int index,AudioConfig audioConfig,byte[] resultBytes) {
+        File targetFile = cacheFileMap.get(index);
+        if(targetFile!= null && targetFile.exists()){
             cacheFileMap.put(index,targetFile);
             return;
-//            targetFile.delete();
         }
+        String suffix = ".mp3";
+//        String suffix = "lame".equals(audioConfig.getAue())?".mp3":".pcm";
+        targetFile = new File(sumFile.getAbsolutePath()+"/localTTS"+index+suffix);
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(targetFile);
@@ -70,6 +82,16 @@ public class FileOperator {
         cacheFileMap.remove(index);
         if(existFile.exists()){
             existFile.delete();
+        }
+    }
+    public void clearFile(){
+        if(sumFile.exists() && sumFile.isDirectory()){
+            File[] files = sumFile.listFiles();
+            if(files!=null && files.length >0){
+                for(File subFile : files){
+                    subFile.delete();
+                }
+            }
         }
     }
 }

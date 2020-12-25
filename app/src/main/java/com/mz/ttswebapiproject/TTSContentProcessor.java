@@ -19,22 +19,21 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
     private FileOperator fileOperator;
     private int currentPlayIndex;
     private int currentHttpIndex;
-    private int seekIndex;
     private boolean isPlaying = true;
     private String[] stringArray;
-    private Context context;
     private String originalText;
+    private AudioConfig audioConfig;
     private TTSTextProcessor textProcessor;
     private List<TextConfig> textConfigList = new ArrayList<>();
     private List<TTSContentProcessorListener> contentProcessorListenerList = new ArrayList<>();
 
     public TTSContentProcessor(Context context, String content) {
-        fileOperator = new FileOperator();
+        audioConfig = new AudioConfig();
+        fileOperator = new FileOperator(context);
         textProcessor = new TTSTextProcessor(this);
         audioPlayer = new TTSAudioPlayerProcessor();
         ttsHttpProcessor = new TTSHttpProcessor();
         this.originalText = content;
-        this.context = context;
     }
 
     public void init() {
@@ -43,10 +42,13 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
         audioPlayer.addTTSAudioPlayerListener(this);
     }
 
-    public void startTTSFromHttp(AudioConfig audioConfig) {
+    public void startTTSFromHttp() {
         if (ttsHttpProcessor != null) {
             ttsHttpProcessor.removeTTSHttpListener(this);
             ttsHttpProcessor = null;
+        }
+        if (currentHttpIndex >= stringArray.length) {
+            return;
         }
         ttsHttpProcessor = new TTSHttpProcessor();
         ttsHttpProcessor.addTTSHttpListener(this);
@@ -81,14 +83,14 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
     @Override
     public void onMediaPlayerCompletion(int index) {
 //        fileOperator.removeExistFile(index);
+        for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
+            contentProcessorListener.onTTSContentOperatorMediaPlayComplete(index,textConfigList.size());
+        }
         if(currentPlayIndex == index){
             currentPlayIndex = ++index;
         }
         if (index >= stringArray.length) {
             LogUtil.e("已经播放到最后一个");
-            for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
-                contentProcessorListener.onTTSContentOperatorMediaPlayComplete();
-            }
             return;
         }
         if (index >= textConfigList.size()) {
@@ -104,7 +106,7 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
 
     @Override
     public void onTTSHttpOperatorSuccess(String requestContent, int index, byte[] resultBytes) {
-        fileOperator.saveFileIntoLocal(context, index, resultBytes);
+        fileOperator.saveFileIntoLocal(index, audioConfig,resultBytes);
         for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
             contentProcessorListener.onTTSContentOperatorHttpSuccess();
         }
@@ -115,8 +117,8 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
         }
         currentHttpIndex = ++index;
         if (currentHttpIndex < stringArray.length) {
-            if(fileOperator.loadFileFromMap(currentHttpIndex) == null){
-                startTTSFromHttp(new AudioConfig());
+            if(fileOperator.loadFileFromMap(currentHttpIndex) == null || !fileOperator.loadFileFromMap(currentHttpIndex).exists()){
+                startTTSFromHttp();
             }
         } else {
             ttsHttpProcessor = null;
@@ -134,13 +136,13 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
     public void startPlay() {
         if (audioPlayer != null) {
             File file = fileOperator.loadFileFromMap(currentPlayIndex);
-            if (file == null) {
+            if (file == null || !file.exists()) {
                 for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
                     contentProcessorListener.onTTSContentOperatorMediaPlayWait();
                 }
                 currentHttpIndex = currentPlayIndex;
                 LogUtil.e("第"+currentHttpIndex+"个没有发现本地文件，开始请求");
-                startTTSFromHttp(new AudioConfig());
+                startTTSFromHttp();
                 return;
             }
             for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
@@ -176,7 +178,34 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
             contentProcessorPause();
         }
     }
-
+    public void updateAudioConfigSpeed(int speed) {
+        audioConfig.setSpeed(speed+"");
+        currentHttpIndex = currentPlayIndex;
+        LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
+        fileOperator.clearFile();
+        startTTSFromHttp();
+    }
+    public void updateAudioConfigSpeaker(String speakerName){
+        audioConfig.setVoice_name(speakerName);
+        currentHttpIndex = currentPlayIndex;
+        LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
+        fileOperator.clearFile();
+        startTTSFromHttp();
+    }
+    public void updateAudioConfigRate(String rate){
+        audioConfig.setAuf(rate);
+        currentHttpIndex = currentPlayIndex;
+        LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
+        fileOperator.clearFile();
+        startTTSFromHttp();
+    }
+    public void updateAudioConfigFormat(String format){
+        audioConfig.setAue(format);
+        currentHttpIndex = currentPlayIndex;
+        LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
+        fileOperator.clearFile();
+        startTTSFromHttp();
+    }
     @Override
     public void onTTSProcessorColorChange(SpannableString spannableString) {
         for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
@@ -232,7 +261,7 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
 
         void onTTSContentOperatorMediaPlayError(String errorInfo);
 
-        void onTTSContentOperatorMediaPlayComplete();
+        void onTTSContentOperatorMediaPlayComplete(int index,int sumSize);
 
         void onTTSContentOperatorHttpSuccess();
 
