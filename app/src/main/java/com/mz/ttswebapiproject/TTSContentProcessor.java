@@ -91,6 +91,7 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
         }
         if (index >= stringArray.length) {
             LogUtil.e("已经播放到最后一个");
+            LogUtil.e("真的播放到最后一个了吗");
             return;
         }
         if (index >= textConfigList.size()) {
