@@ -1,9 +1,11 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.text;
 
 import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+
+import com.mz.ttswebapiproject.bean.TextConfig;
 
 import java.util.ArrayList;
 import java.util.List;

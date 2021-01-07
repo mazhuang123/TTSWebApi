@@ -1,4 +1,4 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.config;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

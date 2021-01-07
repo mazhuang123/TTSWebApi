@@ -1,4 +1,4 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.bean;
 
 /**
  * @Author 作者：mazhuang

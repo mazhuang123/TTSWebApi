@@ -1,4 +1,4 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.ui;
 
 import android.app.Application;
 import android.content.Context;

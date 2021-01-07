@@ -1,6 +1,4 @@
-package com.mz.ttswebapiproject;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.mz.ttswebapiproject.ui;
 
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -12,22 +10,22 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.mz.ttswebapiproject.R;
+import com.mz.ttswebapiproject.presenter.TTSContentPresenter;
+import com.mz.ttswebapiproject.util.LogUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 /**
  * @Author 作者：mazhuang
- *
- * @Date 创建时间： 2020/12/8 10:41
- *
- * @Description 文件描述: https://www.jianshu.com/p/da4a806e599b
- * https://www.cnblogs.com/badaoliumangqizhi/p/14023058.html
- *
- * https://github.com/452896915/jieba-android
- *
+ * @Date 创建时间：2021/1/6 21:35
+ * @Description 文件描述：
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,
-        TTSContentProcessor.TTSContentProcessorListener,SeekBar.OnSeekBarChangeListener {
+public class TTSActivity extends AppCompatActivity implements View.OnClickListener,
+        TTSContentPresenter.TTSContentProcessorListener, SeekBar.OnSeekBarChangeListener {
     private String content = "美国登月的旗子是就是普通尼龙做的," +
             "5美刀一面" +
             "而这个尼龙是聚酰胺纤维（锦纶）的一种说法。" +
@@ -64,14 +62,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SeekBar seekBar,speedSeekBar;
     private ListView speakerListView,rateListView,formatListView;
     private ListViewAdatper speakerListViewAdatper,rateAdapter,formatAdapter;
-    TTSContentProcessor ttsContentProcessor;
+    TTSContentPresenter ttsContentProcessor;
     private List<String> speakList = new ArrayList<>();
     private List<String> rateList = new ArrayList<>();
     private List<String> formatList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.tts_layout);
         contentView = findViewById(R.id.content_view);
         progressBar = findViewById(R.id.tts_listen_book_progress_play_view);
         startBtn = findViewById(R.id.startBtn);
@@ -144,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         contentView.setText(content);
-        ttsContentProcessor = new TTSContentProcessor(this,content);
+        ttsContentProcessor = new TTSContentPresenter(this,content);
         ttsContentProcessor.init();
         ttsContentProcessor.addTTSContentProcessorListener(this);
         speakerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

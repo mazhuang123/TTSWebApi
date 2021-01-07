@@ -1,4 +1,4 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.util;
 
 import java.util.UUID;
 

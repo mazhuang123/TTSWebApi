@@ -1,8 +1,15 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.presenter;
 
 import android.content.Context;
 import android.text.SpannableString;
-import android.util.Log;
+
+import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.config.AudioConfig;
+import com.mz.ttswebapiproject.http.TTSHttpRequestProcessor;
+import com.mz.ttswebapiproject.play.TTSAudioPlayerProcessor;
+import com.mz.ttswebapiproject.text.TTSTextProcessor;
+import com.mz.ttswebapiproject.util.FileOperator;
+import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,8 +20,8 @@ import java.util.List;
  * @Date 创建时间：2020/12/21 11:53
  * @Description 文件描述：中间处理类
  */
-public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TTSAudioPlayerProcessor.TTSAudioPlayerListener, TTSTextProcessor.TTSTextProcessorListener {
-    private TTSHttpProcessor ttsHttpProcessor;
+public class TTSContentPresenter implements TTSHttpRequestProcessor.TTSHttpListener, TTSAudioPlayerProcessor.TTSAudioPlayerListener, TTSTextProcessor.TTSTextProcessorListener {
+    private TTSHttpRequestProcessor ttsHttpRequestProcessor;
     private TTSAudioPlayerProcessor audioPlayer;
     private FileOperator fileOperator;
     private int currentPlayIndex;
@@ -27,12 +34,12 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
     private List<TextConfig> textConfigList = new ArrayList<>();
     private List<TTSContentProcessorListener> contentProcessorListenerList = new ArrayList<>();
 
-    public TTSContentProcessor(Context context, String content) {
+    public TTSContentPresenter(Context context, String content) {
         audioConfig = new AudioConfig();
         fileOperator = new FileOperator(context);
         textProcessor = new TTSTextProcessor(this);
         audioPlayer = new TTSAudioPlayerProcessor();
-        ttsHttpProcessor = new TTSHttpProcessor();
+        ttsHttpRequestProcessor = new TTSHttpRequestProcessor();
         this.originalText = content;
     }
 
@@ -43,16 +50,16 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
     }
 
     public void startTTSFromHttp() {
-        if (ttsHttpProcessor != null) {
-            ttsHttpProcessor.removeTTSHttpListener(this);
-            ttsHttpProcessor = null;
+        if (ttsHttpRequestProcessor != null) {
+            ttsHttpRequestProcessor.removeTTSHttpListener(this);
+            ttsHttpRequestProcessor = null;
         }
         if (currentHttpIndex >= stringArray.length) {
             return;
         }
-        ttsHttpProcessor = new TTSHttpProcessor();
-        ttsHttpProcessor.addTTSHttpListener(this);
-        ttsHttpProcessor.startPost(audioConfig, textConfigList.get(currentHttpIndex).getContent(), currentHttpIndex);
+        ttsHttpRequestProcessor = new TTSHttpRequestProcessor();
+        ttsHttpRequestProcessor.addTTSHttpListener(this);
+        ttsHttpRequestProcessor.startPost(audioConfig, textConfigList.get(currentHttpIndex).getContent(), currentHttpIndex);
     }
 
 
@@ -122,7 +129,7 @@ public class TTSContentProcessor implements TTSHttpProcessor.TTSHttpListener, TT
                 startTTSFromHttp();
             }
         } else {
-            ttsHttpProcessor = null;
+            ttsHttpRequestProcessor = null;
             LogUtil.httpLog("网络请求已经到最后一个");
         }
     }

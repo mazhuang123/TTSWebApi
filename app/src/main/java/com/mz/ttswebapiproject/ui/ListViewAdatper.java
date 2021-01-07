@@ -1,10 +1,12 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.mz.ttswebapiproject.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,8 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.play;
 
 import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+
+import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

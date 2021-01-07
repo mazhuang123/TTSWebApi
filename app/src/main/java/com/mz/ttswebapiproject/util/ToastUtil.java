@@ -1,10 +1,12 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+
+import com.mz.ttswebapiproject.ui.MyApplication;
 
 
 /**

@@ -1,9 +1,11 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.http;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.gson.Gson;
+import com.mz.ttswebapiproject.config.AudioConfig;
+import com.mz.ttswebapiproject.config.Config;
+import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -25,7 +27,7 @@ import okhttp3.Response;
  * @Date 创建时间：2020/12/21 11:47
  * @Description 文件描述：
  */
-public class TTSHttpProcessor {
+public class TTSHttpRequestProcessor {
 
     public void startPost(final AudioConfig audioConfig, final String requestContent, final int index) {
         LogUtil.httpLog("开始网络请求第 " + index);

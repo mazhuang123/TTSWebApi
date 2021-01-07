@@ -1,7 +1,9 @@
-package com.mz.ttswebapiproject;
+package com.mz.ttswebapiproject.util;
 
 import android.content.Context;
 import android.os.Environment;
+
+import com.mz.ttswebapiproject.config.AudioConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,7 +55,7 @@ public class FileOperator {
      * @return
      * @throws IOException
      */
-    public void saveFileIntoLocal(int index,AudioConfig audioConfig,byte[] resultBytes) {
+    public void saveFileIntoLocal(int index, AudioConfig audioConfig, byte[] resultBytes) {
         File targetFile = cacheFileMap.get(index);
         if(targetFile!= null && targetFile.exists()){
             cacheFileMap.put(index,targetFile);

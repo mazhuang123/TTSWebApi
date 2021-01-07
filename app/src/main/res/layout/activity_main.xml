@@ -6,135 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context=".MainActivity">
-
-    <TextView
-        android:id="@+id/content_view"
+    tools:context=".ui.MainActivity">
+    <Button
+        android:text="测试TTS"
+        android:id="@+id/test_tts_btn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:text="进度"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
-        <SeekBar
-            android:id="@+id/seek_bar"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:max="100" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ProgressBar
-                android:id="@+id/tts_listen_book_progress_play_view"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_gravity="center"
-                android:indeterminateBehavior="repeat"
-                android:indeterminateDrawable="@drawable/listen_progress_blue_small"
-                android:visibility="invisible" />
-
-            <Button
-                android:id="@+id/startBtn"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_centerInParent="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:background="@drawable/listen_play_icon"
-                android:focusable="false" />
-        </FrameLayout>
-        <TextView
-            android:layout_marginLeft="30dp"
-            android:text="语速"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
-        <SeekBar
-            android:id="@+id/speed_seek_bar"
-            android:min="1"
-            android:layout_gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:max="100" />
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:weightSum="3"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-        <TextView
-            android:text="发音人"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:text="采样率"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:text="编码格式"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
-    <LinearLayout
-        android:weightSum="3"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ListView
-            android:id="@+id/speaker_list_view"
-            android:scrollbars="none"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <ListView
-            android:id="@+id/rate_list_view"
-            android:scrollbars="none"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <ListView
-            android:id="@+id/format_list_view"
-            android:scrollbars="none"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/test_websocket_btn"
+        android:text="测试websocket"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
