@@ -3,7 +3,8 @@ package com.mz.ttswebapiproject.util;
 import android.content.Context;
 import android.os.Environment;
 
-import com.mz.ttswebapiproject.config.AudioConfig;
+
+import com.mz.ttswebapiproject.presenter.TTSDataKeeper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,15 +20,23 @@ import java.util.Map;
  */
 public class FileOperator {
     public  Map<Integer,File> cacheFileMap = new HashMap<>();
-    private  String AUDIO_PATH;
     private File sumFile;
-
-    public FileOperator(Context context) {
-        AUDIO_PATH = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath()+"/TTSFile";
-        sumFile = new File(AUDIO_PATH);
+    private static FileOperator instance;
+    private  FileOperator(){
+        sumFile = new File(TTSDataKeeper.getInstance().getAudioPath());
         if(!sumFile.exists()){
             sumFile.mkdir();
         }
+    }
+    public static FileOperator getInstance(){
+        if(instance == null){
+            synchronized (FileOperator.class){
+                if(instance == null){
+                    instance = new FileOperator();
+                }
+            }
+        }
+        return instance;
     }
 
     /**
@@ -55,7 +64,7 @@ public class FileOperator {
      * @return
      * @throws IOException
      */
-    public void saveFileIntoLocal(int index, AudioConfig audioConfig, byte[] resultBytes) {
+    public void saveFileIntoLocal(int index, byte[] resultBytes) {
         File targetFile = cacheFileMap.get(index);
         if(targetFile!= null && targetFile.exists()){
             cacheFileMap.put(index,targetFile);

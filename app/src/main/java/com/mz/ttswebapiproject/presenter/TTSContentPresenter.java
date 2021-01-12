@@ -4,8 +4,9 @@ import android.content.Context;
 import android.text.SpannableString;
 
 import com.mz.ttswebapiproject.bean.TextConfig;
-import com.mz.ttswebapiproject.config.AudioConfig;
-import com.mz.ttswebapiproject.http.TTSHttpRequestProcessor;
+import com.mz.ttswebapiproject.http.TTSHttpProcessor;
+import com.mz.ttswebapiproject.listener.TTSHttpProcessorListener;
+import com.mz.ttswebapiproject.listener.TTSTextProcessorListener;
 import com.mz.ttswebapiproject.play.TTSAudioPlayerProcessor;
 import com.mz.ttswebapiproject.text.TTSTextProcessor;
 import com.mz.ttswebapiproject.util.FileOperator;
@@ -20,46 +21,42 @@ import java.util.List;
  * @Date 创建时间：2020/12/21 11:53
  * @Description 文件描述：中间处理类
  */
-public class TTSContentPresenter implements TTSHttpRequestProcessor.TTSHttpListener, TTSAudioPlayerProcessor.TTSAudioPlayerListener, TTSTextProcessor.TTSTextProcessorListener {
-    private TTSHttpRequestProcessor ttsHttpRequestProcessor;
+public class TTSContentPresenter implements TTSHttpProcessorListener, TTSAudioPlayerProcessor.TTSAudioPlayerListener, TTSTextProcessorListener {
+    private TTSHttpProcessor ttsHttpProcessor;
     private TTSAudioPlayerProcessor audioPlayer;
-    private FileOperator fileOperator;
     private int currentPlayIndex;
     private int currentHttpIndex;
     private boolean isPlaying = true;
     private String[] stringArray;
     private String originalText;
-    private AudioConfig audioConfig;
     private TTSTextProcessor textProcessor;
     private List<TextConfig> textConfigList = new ArrayList<>();
     private List<TTSContentProcessorListener> contentProcessorListenerList = new ArrayList<>();
 
-    public TTSContentPresenter(Context context, String content) {
-        audioConfig = new AudioConfig();
-        fileOperator = new FileOperator(context);
+    public TTSContentPresenter(String content) {
+        this.originalText = content;
         textProcessor = new TTSTextProcessor(this);
         audioPlayer = new TTSAudioPlayerProcessor();
-        ttsHttpRequestProcessor = new TTSHttpRequestProcessor();
-        this.originalText = content;
     }
 
     public void init() {
         stringArray = textProcessor.executeSplit(originalText);
         textConfigList.addAll(textProcessor.getTextConfigList());
         audioPlayer.addTTSAudioPlayerListener(this);
+        ttsHttpProcessor = new TTSHttpProcessor(stringArray);
     }
 
     public void startTTSFromHttp() {
-        if (ttsHttpRequestProcessor != null) {
-            ttsHttpRequestProcessor.removeTTSHttpListener(this);
-            ttsHttpRequestProcessor = null;
+        if (ttsHttpProcessor != null) {
+            ttsHttpProcessor.removeTTSHttpProcessorListener(this);
+            ttsHttpProcessor = null;
         }
         if (currentHttpIndex >= stringArray.length) {
             return;
         }
-        ttsHttpRequestProcessor = new TTSHttpRequestProcessor();
-        ttsHttpRequestProcessor.addTTSHttpListener(this);
-        ttsHttpRequestProcessor.startPost(audioConfig, textConfigList.get(currentHttpIndex).getContent(), currentHttpIndex);
+        ttsHttpProcessor = new TTSHttpProcessor(stringArray);
+        ttsHttpProcessor.addTTSHttpProcessorListener(this);
+        ttsHttpProcessor. startRequest(textConfigList.get(currentHttpIndex).getContent());
     }
 
 
@@ -113,37 +110,16 @@ public class TTSContentPresenter implements TTSHttpRequestProcessor.TTSHttpListe
     }
 
     @Override
-    public void onTTSHttpOperatorSuccess(String requestContent, int index, byte[] resultBytes) {
-        fileOperator.saveFileIntoLocal(index, audioConfig,resultBytes);
-        for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
-            contentProcessorListener.onTTSContentOperatorHttpSuccess();
-        }
-        LogUtil.e("接口返回成功"+index+"::::"+currentPlayIndex);
+    public void onTTSHttpOperatorSuccess(String requestContent, int index) {
         if (index == currentPlayIndex) {
             textProcessor.fillPlayTextColor(originalText, textConfigList.get(index));
             startPlay();
-        }
-        currentHttpIndex = ++index;
-        if (currentHttpIndex < stringArray.length) {
-            if(fileOperator.loadFileFromMap(currentHttpIndex) == null || !fileOperator.loadFileFromMap(currentHttpIndex).exists()){
-                startTTSFromHttp();
-            }
-        } else {
-            ttsHttpRequestProcessor = null;
-            LogUtil.httpLog("网络请求已经到最后一个");
-        }
-    }
-
-    @Override
-    public void onTTsHttpOperatorFail(String requestContent, int index, String failInfo) {
-        for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
-            contentProcessorListener.onTTSContentOperatorHttpFail(failInfo);
         }
     }
 
     public void startPlay() {
         if (audioPlayer != null) {
-            File file = fileOperator.loadFileFromMap(currentPlayIndex);
+            File file = FileOperator.getInstance().loadFileFromMap(currentPlayIndex);
             if (file == null || !file.exists()) {
                 for (TTSContentProcessorListener contentProcessorListener : contentProcessorListenerList) {
                     contentProcessorListener.onTTSContentOperatorMediaPlayWait();
@@ -187,31 +163,31 @@ public class TTSContentPresenter implements TTSHttpRequestProcessor.TTSHttpListe
         }
     }
     public void updateAudioConfigSpeed(int speed) {
-        audioConfig.setSpeed(speed+"");
+        TTSDataKeeper.getInstance().getAudioConfig().setSpeed(speed+"");
         currentHttpIndex = currentPlayIndex;
         LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
-        fileOperator.clearFile();
+        FileOperator.getInstance().clearFile();
         startTTSFromHttp();
     }
     public void updateAudioConfigSpeaker(String speakerName){
-        audioConfig.setVoice_name(speakerName);
+        TTSDataKeeper.getInstance().getAudioConfig().setVoice_name(speakerName);
         currentHttpIndex = currentPlayIndex;
         LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
-        fileOperator.clearFile();
+        FileOperator.getInstance().clearFile();
         startTTSFromHttp();
     }
     public void updateAudioConfigRate(String rate){
-        audioConfig.setAuf(rate);
+        TTSDataKeeper.getInstance().getAudioConfig().setAuf(rate);
         currentHttpIndex = currentPlayIndex;
         LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
-        fileOperator.clearFile();
+        FileOperator.getInstance().clearFile();
         startTTSFromHttp();
     }
     public void updateAudioConfigFormat(String format){
-        audioConfig.setAue(format);
+        TTSDataKeeper.getInstance().getAudioConfig().setAue(format);
         currentHttpIndex = currentPlayIndex;
         LogUtil.e("更新了参数，此时正在播放第"+currentPlayIndex);
-        fileOperator.clearFile();
+        FileOperator.getInstance().clearFile();
         startTTSFromHttp();
     }
     @Override
@@ -270,10 +246,6 @@ public class TTSContentPresenter implements TTSHttpRequestProcessor.TTSHttpListe
         void onTTSContentOperatorMediaPlayError(String errorInfo);
 
         void onTTSContentOperatorMediaPlayComplete(int index,int sumSize);
-
-        void onTTSContentOperatorHttpSuccess();
-
-        void onTTSContentOperatorHttpFail(String info);
 
         void onTTSContentOperatorTextColorChange(SpannableString spannableString);
     }

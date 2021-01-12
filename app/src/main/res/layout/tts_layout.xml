@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
+    android:id="@+id/root_view"
     tools:context=".ui.TTSActivity">
 
     <TextView
@@ -33,6 +34,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -59,82 +61,34 @@
                 android:background="@drawable/listen_play_icon"
                 android:focusable="false" />
         </FrameLayout>
-        <TextView
-            android:layout_marginLeft="30dp"
-            android:text="语速"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
-        <SeekBar
-            android:id="@+id/speed_seek_bar"
-            android:min="1"
-            android:layout_gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:max="100" />
     </LinearLayout>
     <LinearLayout
-        android:orientation="horizontal"
-        android:weightSum="3"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-        <TextView
-            android:text="发音人"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:text="采样率"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:text="编码格式"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
-    <LinearLayout
-        android:weightSum="3"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <ListView
-            android:id="@+id/speaker_list_view"
-            android:scrollbars="none"
+        <Button
             android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
+            android:text="语速"
+            android:id="@+id/speed_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <ListView
-            android:id="@+id/rate_list_view"
-            android:scrollbars="none"
+        <Button
             android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <View
-            android:background="@color/colorPrimary"
-            android:layout_width="1dp"
+            android:text="发音人"
+            android:id="@+id/speaker_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <ListView
-            android:id="@+id/format_list_view"
-            android:scrollbars="none"
+        <Button
             android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+            android:text="采样率"
+            android:id="@+id/sample_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:layout_weight="1"
+            android:text="编码格式"
+            android:id="@+id/format_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </LinearLayout>

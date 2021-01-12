@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.WebSocketActivity" />
+        <activity android:name=".ui.TTSActivity" />
     </application>
 
 </manifest>

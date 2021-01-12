@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/speed_title_view"
+        android:background="@drawable/tts_title_background"
+        android:text="语速"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"/>
+    <SeekBar
+        android:id="@+id/speed_fragment_seek_bar"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:max="100"
+        android:min="1" />
+</LinearLayout>

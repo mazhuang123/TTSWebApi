@@ -6,6 +6,7 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 
 import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.listener.TTSTextProcessorListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,9 +125,6 @@ public class TTSTextProcessor {
                 , textConfig.getParaEnd()
                 , Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         ttsTextProcessorListener.onTTSProcessorColorChange(spannableString);
-    }
-    public interface TTSTextProcessorListener{
-        void onTTSProcessorColorChange(SpannableString spannableString);
     }
 }
 

@@ -3,8 +3,8 @@ package com.mz.ttswebapiproject.http;
 import android.util.Base64;
 
 import com.google.gson.Gson;
-import com.mz.ttswebapiproject.config.AudioConfig;
 import com.mz.ttswebapiproject.config.Config;
+import com.mz.ttswebapiproject.presenter.TTSDataKeeper;
 import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.IOException;
@@ -27,11 +27,11 @@ import okhttp3.Response;
  * @Date 创建时间：2020/12/21 11:47
  * @Description 文件描述：
  */
-public class TTSHttpRequestProcessor {
+public class TTSHttpUtil {
 
-    public void startPost(final AudioConfig audioConfig, final String requestContent, final int index) {
+    public void startPost(final String requestContent, final int index) {
         LogUtil.httpLog("开始网络请求第 " + index);
-        String audioBeanJsonStr = new Gson().toJson(audioConfig);
+        String audioBeanJsonStr = new Gson().toJson(TTSDataKeeper.getInstance().getAudioConfig());
         String base64AudioStr = null;
         try {
             base64AudioStr = Base64.encodeToString(audioBeanJsonStr.getBytes("UTF-8"), Base64.NO_WRAP | Base64.URL_SAFE);
