@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    android:id="@+id/root_view"
     tools:context=".ui.TTSActivity">
 
     <TextView
@@ -17,78 +17,78 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
-            android:text="进度"
-            android:gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="进度" />
+
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:max="100" />
     </LinearLayout>
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+        <TextView
+            android:text="已经缓存到:"
+            android:gravity="center"
+            android:id="@+id/request_index_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:text="正在播放第："
+            android:gravity="center"
+            android:layout_marginLeft="50dp"
+            android:id="@+id/play_index_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+
+    </LinearLayout>
+    <include layout="@layout/tts_play_layout"/>
 
     <LinearLayout
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
 
-            <ProgressBar
-                android:id="@+id/tts_listen_book_progress_play_view"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_gravity="center"
-                android:indeterminateBehavior="repeat"
-                android:indeterminateDrawable="@drawable/listen_progress_blue_small"
-                android:visibility="invisible" />
-
-            <Button
-                android:id="@+id/startBtn"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_centerInParent="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:background="@drawable/listen_play_icon"
-                android:focusable="false" />
-        </FrameLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <Button
-            android:layout_weight="1"
-            android:text="语速"
             android:id="@+id/speed_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="发音人"
+            android:text="语速" />
+
+        <Button
             android:id="@+id/speaker_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="采样率"
+            android:text="发音人" />
+
+        <Button
             android:id="@+id/sample_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="编码格式"
+            android:text="采样率" />
+
+        <Button
             android:id="@+id/format_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="编码格式" />
     </LinearLayout>
 </LinearLayout>

@@ -3,10 +3,7 @@ package com.mz.ttswebapiproject.ui;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -17,14 +14,13 @@ import com.mz.ttswebapiproject.dialogfragment.FormatDialogFragment;
 import com.mz.ttswebapiproject.dialogfragment.SampleDialogFragment;
 import com.mz.ttswebapiproject.dialogfragment.SpeakerDialogFragment;
 import com.mz.ttswebapiproject.dialogfragment.SpeedDialogFragment;
+import com.mz.ttswebapiproject.listener.TTSManagerListener;
+import com.mz.ttswebapiproject.listener.TTSDataLoadProgressListener;
 import com.mz.ttswebapiproject.listener.TTSConfigItemListener;
 import com.mz.ttswebapiproject.listener.TTSSpeedListener;
-import com.mz.ttswebapiproject.presenter.TTSContentPresenter;
-import com.mz.ttswebapiproject.presenter.TTSDataKeeper;
+import com.mz.ttswebapiproject.manager.TTSManager;
+import com.mz.ttswebapiproject.manager.TTSDataKeeper;
 import com.mz.ttswebapiproject.util.LogUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,19 +30,23 @@ import androidx.appcompat.app.AppCompatActivity;
  * @Description 文件描述：
  */
 public class TTSActivity extends AppCompatActivity implements View.OnClickListener,
-        TTSContentPresenter.TTSContentProcessorListener,
-        SeekBar.OnSeekBarChangeListener, TTSConfigItemListener,TTSSpeedListener {
-    private TextView contentView;
+        TTSManagerListener,
+        SeekBar.OnSeekBarChangeListener,
+        TTSConfigItemListener,
+        TTSSpeedListener, TTSDataLoadProgressListener {
+    private TextView contentView,requestIndexView,playIndexView;
     private Button startBtn,speakerBtn,sampleBtn,formatBtn;
     private ProgressBar progressBar;
     private SeekBar progressSeekBar;
-    TTSContentPresenter ttsContentProcessor;
+    TTSManager ttsContentProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tts_layout);
         contentView = findViewById(R.id.content_view);
+        requestIndexView = findViewById(R.id.request_index_view);
+        playIndexView = findViewById(R.id.play_index_view);
         progressBar = findViewById(R.id.tts_listen_book_progress_play_view);
         startBtn = findViewById(R.id.startBtn);
         progressSeekBar = findViewById(R.id.seek_bar);
@@ -62,9 +62,9 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
         speedBtn.setOnClickListener(this);
         TTSDataKeeper.getInstance().setAudioPath(this);
         contentView.setText(Config.getContent());
-        ttsContentProcessor = new TTSContentPresenter(Config.getContent());
-        ttsContentProcessor.init();
-        ttsContentProcessor.addTTSContentProcessorListener(this);
+        ttsContentProcessor = new TTSManager(Config.getContent());
+        ttsContentProcessor.addTTSManagerListener(this);
+        ttsContentProcessor.addTTSAudioRequestProgressListener(this);
     }
 
     @Override
@@ -110,9 +110,9 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
             progressBar.setVisibility(View.INVISIBLE);
         }
     }
-    public void setPlayState(boolean isPlaying,boolean isStartLoad){
+    public void setPlayState(boolean shouldPlay,boolean isStartLoad){
         if(startBtn != null){
-            if (isPlaying) {
+            if (shouldPlay) {
                 startBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.listen_pause_icon));
                 if (isStartLoad){
                     startLoading();
@@ -127,27 +127,27 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayWait() {
+    public void onMediaPlayWait() {
         setPlayState(true,true);
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayPause() {
+    public void onMediaPlayPause() {
         setPlayState(false,false);
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayPlaying() {
+    public void onMediaPlayPlaying(int index,boolean isPlaying) {
         setPlayState(true,false);
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayError(String errorInfo) {
+    public void onMediaPlayError(String errorInfo) {
         setPlayState(false,true);
     }
 
     @Override
-    public void onTTSContentOperatorMediaPlayComplete(int index,int sumSize) {
+    public void onMediaPlayComplete(int index, int sumSize) {
         float progress = (index+1)*100/sumSize;
         LogUtil.e("播放进度为："+progress);
         progressSeekBar.setProgress((int) progress);
@@ -155,13 +155,18 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
 
 
     @Override
-    public void onTTSContentOperatorTextColorChange(final SpannableString spannableString) {
+    public void onTextColorChange(final SpannableString spannableString) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 contentView.setText(spannableString);
             }
         });
+    }
+
+    @Override
+    public void onMediaPlayOver() {
+        setPlayState(false,false);
     }
 
     @Override
@@ -207,4 +212,15 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
     public void onFormatItemClick(String content) {
         ttsContentProcessor.updateAudioConfigFormat(content);
     }
+
+    @Override
+    public void onAudioRequestProgress(final int index) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                requestIndexView.setText("已经缓存到: "+index);
+            }
+        });
+    }
+
 }

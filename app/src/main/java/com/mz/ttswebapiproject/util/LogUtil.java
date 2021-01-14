@@ -18,4 +18,8 @@ public class LogUtil {
     public static void e(String message){
         Log.e(TAG, message);
     }
+
+    public static void lingXi(String message){
+        Log.e("lingxi+++", message);
+    }
 }

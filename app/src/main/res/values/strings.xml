@@ -1,3 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">TTSWebApiProject</string>
+    <!-- 填入你申请的应用appid信息 -->
+    <string name="app_id" tools:ignore="ExtraTranslation">5feae654</string>
 </resources>
