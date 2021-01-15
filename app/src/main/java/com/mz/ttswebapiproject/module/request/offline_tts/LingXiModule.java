@@ -14,6 +14,7 @@ import com.iflytek.cloud.msc.tts.ISynthesizeResult;
 import com.iflytek.cloud.msc.tts.SpeakSession;
 import com.iflytek.cloud.util.ResourceUtil;
 import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
+import com.mz.ttswebapiproject.module.request.DataSynthesizeModule;
 import com.mz.ttswebapiproject.ui.MyApplication;
 import com.mz.ttswebapiproject.util.LogUtil;
 import com.mz.ttswebapiproject.util.ToastUtil;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
  * @Date 创建时间：2021/1/12 20:19
  * @Description 文件描述：
  */
-public class LingXiModule {
+public class LingXiModule implements DataSynthesizeModule {
 
     // 语音合成对象
     private SpeechSynthesizer mTts;
@@ -36,12 +37,13 @@ public class LingXiModule {
     private TTSDataLoadListener ttsDataLoadListener;
     private String content;
     private int index;
+
     public LingXiModule() {
-        // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(MyApplication.getContext(), mTtsInitListener);
         LogUtil.lingXi("ad");
     }
-    public void startSynthesis(String content,int index){
+
+    public void startSynthesis(String content, int index){
         this.content = content;
         this.index = index;
         // 清空参数
@@ -51,17 +53,13 @@ public class LingXiModule {
         mTts.setParameter(ResourceUtil.TTS_RES_PATH, getHighResourcePath());
         //设置发音人
         mTts.setParameter(SpeechConstant.VOICE_NAME, voicerLocal);
-
         //设置语速
         mTts.setParameter(SpeechConstant.SPEED, "500");
         //设置播放器音频流类型
         mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
-
         //保存合成音频文件
         mTts.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
         mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/wav/test.wav");
-
-
         SpeakSession.setCallListener(mCallResult);
         int code = mTts.startSpeaking(content, mTtsListener);
         if (code != ErrorCode.SUCCESS) {
@@ -69,9 +67,7 @@ public class LingXiModule {
         }
     }
     private ISynthesizeResult mCallResult = new ISynthesizeResult() {
-
         @Override
-
         public void bufferData(IFlySpeechSynthesizerResult iFlySpeechSynthesizerResult, SpeechError error) {
             String format = iFlySpeechSynthesizerResult.getFormat();
             ArrayList<byte[]> arrayList = iFlySpeechSynthesizerResult.getmBuffer();
@@ -101,12 +97,6 @@ public class LingXiModule {
             }
         }
     };
-    public void addDataLoadListener(TTSDataLoadListener TTSDataLoadListener){
-        this.ttsDataLoadListener = TTSDataLoadListener;
-    }
-    public void removeDataLoadListener(){
-        this.ttsDataLoadListener = null;
-    }
     /**
      * 合成回调监听。
      */
@@ -154,5 +144,17 @@ public class LingXiModule {
 
         }
     };
+
+
+    @Override
+    public void synthesizeStart(String content,int index) {
+        startSynthesis(content,index);
+    }
+
+    @Override
+    public void addTTSDataLoadListener(TTSDataLoadListener ttsDataLoadListener) {
+        this.ttsDataLoadListener = ttsDataLoadListener;
+    }
+
 }
 

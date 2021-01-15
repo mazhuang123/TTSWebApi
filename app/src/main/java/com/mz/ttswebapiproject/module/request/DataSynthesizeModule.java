@@ -9,8 +9,7 @@ import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
  */
 public interface DataSynthesizeModule {
 
-     void initSynthesizeModule();
+     void synthesizeStart(String content, int index);
 
-     void synthesizeStart(String content, TTSDataLoadListener ttsDataLoadListener);
-
+     void addTTSDataLoadListener(TTSDataLoadListener ttsDataLoadListener);
 }

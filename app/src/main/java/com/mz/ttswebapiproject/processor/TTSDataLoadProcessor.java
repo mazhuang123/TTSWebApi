@@ -3,6 +3,7 @@ package com.mz.ttswebapiproject.processor;
 import com.mz.ttswebapiproject.bean.TextConfig;
 import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
 import com.mz.ttswebapiproject.listener.TTSDataLoadProcessorListener;
+import com.mz.ttswebapiproject.module.request.DataSynthesizeModule;
 import com.mz.ttswebapiproject.module.request.http.TTSHttpModule;
 import com.mz.ttswebapiproject.module.request.offline_tts.LingXiModule;
 import com.mz.ttswebapiproject.util.FileOperator;
@@ -15,19 +16,15 @@ import java.util.List;
  * @Date 创建时间：2021/1/6 19:59
  * @Description 文件描述：网络请求结果处理类，决定如何请求，请求索引等
  */
-public class TTSDataLoadProcessor implements TTSDataLoadListener {
+public class TTSDataLoadProcessor {
     private int currentIndex;
-    private TTSHttpModule httpUtil;
-    private LingXiModule lingXiModule;
-    private boolean isOffline;//是否选用离线sdk加载数据
+    private DataSynthesizeModule dataSynthesizeModule;
     private List<TextConfig> textConfigList;
 
     public TTSDataLoadProcessor() {
-        httpUtil = new TTSHttpModule();
-        httpUtil.addDataLoadListener(this);
-        lingXiModule = new LingXiModule();
-        lingXiModule.addDataLoadListener(this);
+        dataSynthesizeModule = new TTSHttpModule();
         textConfigList = new ArrayList<>();
+        dataSynthesizeModule.addTTSDataLoadListener(this);
     }
 
     public void loadTextData(List<TextConfig> configs) {
@@ -63,11 +60,7 @@ public class TTSDataLoadProcessor implements TTSDataLoadListener {
     }
 
     public void load() {
-        if (isOffline) {
-            lingXiModule.startSynthesis(textConfigList.get(currentIndex).getContent(),currentIndex);
-        } else {
-            httpUtil.startPost(textConfigList.get(currentIndex).getContent(), currentIndex);
-        }
+        dataSynthesizeModule.synthesizeStart(textConfigList.get(currentIndex).getContent(),currentIndex);
     }
 
     /**
@@ -84,7 +77,11 @@ public class TTSDataLoadProcessor implements TTSDataLoadListener {
         return false;
     }
     public void switchOfflineState(boolean isOffline){
-        this.isOffline = isOffline;
+        if(isOffline){
+            dataSynthesizeModule = new LingXiModule();
+        } else {
+            dataSynthesizeModule = new TTSHttpModule();
+        }
     }
     private List<TTSDataLoadProcessorListener> ttsDataLoadProcessorListenerList = new ArrayList<>();
 

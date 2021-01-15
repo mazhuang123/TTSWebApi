@@ -7,6 +7,7 @@ import com.mz.ttswebapiproject.config.Config;
 import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
 import com.mz.ttswebapiproject.manager.TTSDataKeeper;
 import com.mz.ttswebapiproject.module.request.DataSynthesizeModule;
+import com.mz.ttswebapiproject.module.request.offline_tts.LingXiModule;
 import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.IOException;
@@ -66,6 +67,7 @@ public class TTSHttpModule implements DataSynthesizeModule {
                 for (int i = 0; i < headers.size(); i++) {
 //                    LogUtil.e(headers.name(i) + ":" + headers.value(i));
                 }
+                DataSynthesizeModule dataSynthesizeModule = new LingXiModule();
                 byte[] resultBytes = response.body().bytes();
                 ArrayList<byte[]> resultBytesList = new ArrayList<>();
                 resultBytesList.add(resultBytes);
@@ -77,24 +79,17 @@ public class TTSHttpModule implements DataSynthesizeModule {
         });
     }
     private List<TTSDataLoadListener> ttsDataLoadListenerList = new ArrayList<>();
-    public void addDataLoadListener(TTSDataLoadListener ttsDataLoadListener){
+
+    @Override
+    public void synthesizeStart(String content, int index) {
+
+    }
+
+    @Override
+    public void addTTSDataLoadListener(TTSDataLoadListener ttsDataLoadListener) {
         if(ttsDataLoadListenerList != null){
             ttsDataLoadListenerList.add(ttsDataLoadListener);
         }
     }
-    public void removeDataLoadListener(TTSDataLoadListener ttsDataLoadListener){
-        if(ttsDataLoadListenerList != null && ttsDataLoadListenerList.size() > 0){
-            ttsDataLoadListenerList.remove(ttsDataLoadListener);
-        }
-    }
 
-    @Override
-    public void initSynthesizeModule() {
-
-    }
-
-    @Override
-    public void synthesizeStart(String content, TTSDataLoadListener ttsDataLoadListener) {
-
-    }
 }
