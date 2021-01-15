@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.mz.ttswebapiproject.config.Config;
 import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
 import com.mz.ttswebapiproject.manager.TTSDataKeeper;
+import com.mz.ttswebapiproject.module.request.DataSynthesizeModule;
 import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ import okhttp3.Response;
  * @Date 创建时间：2020/12/21 11:47
  * @Description 文件描述：仅仅用于网络请求，不涉及任何业务逻辑
  */
-public class TTSHttpModule {
+public class TTSHttpModule implements DataSynthesizeModule {
 
     public void startPost(final String requestContent, final int index) {
         LogUtil.httpLog("开始网络请求第 " + index);
@@ -85,5 +86,15 @@ public class TTSHttpModule {
         if(ttsDataLoadListenerList != null && ttsDataLoadListenerList.size() > 0){
             ttsDataLoadListenerList.remove(ttsDataLoadListener);
         }
+    }
+
+    @Override
+    public void initSynthesizeModule() {
+
+    }
+
+    @Override
+    public void synthesizeStart(String content, TTSDataLoadListener ttsDataLoadListener) {
+
     }
 }
