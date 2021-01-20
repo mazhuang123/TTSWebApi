@@ -6,7 +6,7 @@
     <TextView
         android:id="@+id/config_title_view"
         android:background="@drawable/tts_title_background"
-        android:text="发音人"
+        android:text="标题"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="18sp"

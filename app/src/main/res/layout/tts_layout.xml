@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"/>
         <TextView
-            android:text="正在播放第："
+            android:text="已经播放："
             android:gravity="center"
             android:layout_marginLeft="50dp"
             android:id="@+id/play_index_view"
@@ -90,5 +90,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="编码格式" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/engine_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="引擎类型" />
     </LinearLayout>
 </LinearLayout>

@@ -51,6 +51,7 @@ public class FormatDialogFragment extends BaseDialogFragment implements ListView
     @Override
     public void onClickItem(int position) {
         ttsConfigItemListener.onFormatItemClick(formatList.get(position));
+        getDialog().dismiss();
     }
     private void initFormatList(){
         formatList.add("wav/pcm");

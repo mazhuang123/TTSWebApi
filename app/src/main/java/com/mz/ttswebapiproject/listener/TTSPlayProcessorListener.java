@@ -11,7 +11,6 @@ public interface TTSPlayProcessorListener {
 
     void onPlayProcessorError(int index,String errorInfo);
 
-    void onPlayProcessorPrepare(int index);
 
     void onPlayProcessorPause(int index);
 
@@ -20,6 +19,8 @@ public interface TTSPlayProcessorListener {
     void onPlayProcessorCompletion(int index);
 
     void onPlayProcessorPlaying(int index,boolean isPlaying);
+
+    void onPlayerProcessorPlayState(int index,boolean isPlaying);
 
     void onPlayProcessorOver();
 

@@ -47,5 +47,6 @@ public class SpeedDialogFragment extends BaseDialogFragment implements SeekBar.O
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         ttsSpeedListener.onTTSSpeedStopTrackingTouch(seekBar);
+        getDialog().dismiss();
     }
 }

@@ -2,6 +2,8 @@ package com.mz.ttswebapiproject.listener;
 
 import android.text.SpannableString;
 
+import com.mz.ttswebapiproject.bean.TextConfig;
+
 /**
  * @Author 作者：mazhuang
  * @Date 创建时间：2021/1/12 15:46
@@ -13,13 +15,15 @@ public interface TTSManagerListener {
 
     void onMediaPlayPause();
 
-    void onMediaPlayPlaying(int index,boolean isPlaying);
-
     void onMediaPlayError(String errorInfo);
 
     void onMediaPlayComplete(int index, int sumSize);
 
+    void onMediaPlayOver();
+
     void onTextColorChange(SpannableString spannableString);
 
-    void onMediaPlayOver();
+    void onManagerAudioRequestProgress(int index);
+
+    void onManagerAudioRequestFailed(String errorInfo);
 }

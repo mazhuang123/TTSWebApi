@@ -1,5 +1,7 @@
 package com.mz.ttswebapiproject.bean;
 
+import android.text.SpannableString;
+
 /**
  * @Author 作者：mazhuang
  * @Date 创建时间：2020/12/22 10:38
@@ -10,7 +12,8 @@ public class TextConfig {
     private int index;//某句话在分割后生成的数组中占的位置
     private int paraStart;
     private int paraEnd;
-
+    private SpannableString playSpannableString;//正在播放的高亮字符串
+    private SpannableString requestSpannableString;//缓存成功的高亮字符串
     public String getContent() {
         return content;
     }
@@ -42,4 +45,5 @@ public class TextConfig {
     public void setIndex(int index) {
         this.index = index;
     }
+
 }

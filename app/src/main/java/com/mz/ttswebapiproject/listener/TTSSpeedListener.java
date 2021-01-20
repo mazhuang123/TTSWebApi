@@ -10,7 +10,6 @@ import android.widget.SeekBar;
  */
 public interface TTSSpeedListener {
 
-
     void onTTSSpeedChanged(SeekBar seekBar, int i, boolean b);
 
     void onTTSSpeedStartTrackingTouch(SeekBar seekBar);

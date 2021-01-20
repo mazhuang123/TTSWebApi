@@ -7,9 +7,11 @@ package com.mz.ttswebapiproject.listener;
  */
 public interface TTSConfigItemListener {
 
-    void onSpeakerItemClick(String content);
+    void onSpeakerItemClick(String speaker);
 
-    void onSampleItemClick(String content);
+    void onSampleItemClick(String sampleRate);
 
-    void onFormatItemClick(String content);
+    void onFormatItemClick(String format);
+
+    void onEngineTypeItemClick(String engineType);
 }

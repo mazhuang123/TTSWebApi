@@ -8,6 +8,11 @@ package com.mz.ttswebapiproject.config;
 public class Config {
     public static final String APP_ID = "5fbccb84";
     public static final String TTS_URL = "http://openapi.lingxicloud.com/v1/service/v1/tts";
+    public static final String ENGINE_TYPE_HTTP = "https_engine";
+    public static final String ENGINE_TYPE_LINGXI_OFFLINE = "lingxi_offline_engine";
+
+
+
     private static String content = "美国登月的旗子是就是普通尼龙做的," +
             "5美刀一面" +
             "而这个尼龙是聚酰胺纤维（锦纶）的一种说法。" +

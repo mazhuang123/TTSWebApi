@@ -11,8 +11,6 @@ public interface TTSMediaPlayerModuleListener {
 
     void onMediaPlayerError(int index,String errorInfo);
 
-    void onMediaPlayerPrepare(int index);
-
     void onMediaPlayerPause(int index);
 
     void onMediaPlayerStop(int index);

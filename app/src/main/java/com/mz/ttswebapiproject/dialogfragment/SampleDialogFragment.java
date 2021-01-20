@@ -56,5 +56,6 @@ public class SampleDialogFragment extends BaseDialogFragment implements ListView
     @Override
     public void onClickItem(int position) {
         ttsConfigItemListener.onSampleItemClick(rateList.get(position));
+        getDialog().dismiss();
     }
 }

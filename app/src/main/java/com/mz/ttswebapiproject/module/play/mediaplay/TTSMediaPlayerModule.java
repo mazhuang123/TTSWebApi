@@ -83,7 +83,7 @@ public class TTSMediaPlayerModule {
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     for (TTSMediaPlayerModuleListener audioPlayerListener : ttsAudioPlayerListenerList) {
                         if (audioPlayerListener != null) {
-                            audioPlayerListener.onMediaPlayerPrepare(currentPlayIndex);
+                            audioPlayerListener.onMediaPlayerPlaying(currentPlayIndex,true);
                         }
                     }
                     mediaPlayer.start();

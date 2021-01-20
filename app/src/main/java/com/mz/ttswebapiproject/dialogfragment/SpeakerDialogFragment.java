@@ -48,6 +48,7 @@ public class SpeakerDialogFragment extends BaseDialogFragment implements ListVie
     @Override
     public void onClickItem(int position) {
         ttsConfigItemListener.onSpeakerItemClick(speakList.get(position));
+        getDialog().dismiss();
     }
     private void initSpeakerList() {
         speakList.add("aisbabyxu");

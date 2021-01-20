@@ -7,7 +7,7 @@ package com.mz.ttswebapiproject.bean;
  */
 public class AudioConfig {
     private String auf = "audio/L16;rate=16000";
-    private String aue = "lame";
+    private String aue = "raw";
     private String voice_name = "xiaoyan";
     private String speed = "50";
     private String volume = "20";

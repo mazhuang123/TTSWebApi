@@ -69,7 +69,6 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
         }
     }
     public void play(){
-        ttsPlayProcessorListener.onPlayProcessorPlaying(currentIndex,true);
         ttsMediaPlayerModule.startPlay(currentIndex);
     }
     /**
@@ -97,7 +96,7 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
 
     public boolean isMediaPlaying(){
          if(ttsMediaPlayerModule!=null){
-              ttsPlayProcessorListener.onPlayProcessorPlaying(currentIndex,ttsMediaPlayerModule.isPlaying());
+              ttsPlayProcessorListener.onPlayerProcessorPlayState(currentIndex,ttsMediaPlayerModule.isPlaying());
               return ttsMediaPlayerModule.isPlaying();
          }
          return false;
@@ -116,11 +115,6 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
     }
 
     @Override
-    public void onMediaPlayerPrepare(int index) {
-        ttsPlayProcessorListener.onPlayProcessorPrepare(index);
-    }
-
-    @Override
     public void onMediaPlayerPause(int index) {
         ttsPlayProcessorListener.onPlayProcessorPause(index);
     }
@@ -133,10 +127,6 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
     @Override
     public void onMediaPlayerCompletion(int index) {
         ttsPlayProcessorListener.onPlayProcessorCompletion(index);
-//        if(!ttsMediaPlayerModule.isPlaying()){
-//            LogUtil.e("没有正在播放，直接return");
-//            return;
-//        }
         playNext();
     }
 

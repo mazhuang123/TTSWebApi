@@ -7,13 +7,18 @@ package com.mz.ttswebapiproject.listener;
  */
 public interface TTSDataLoadProcessorListener {
     /**
-     * 请求成功后的回调，主要是给TTSContentPresenter提供回调数据
+     * 请求成功后的回调，主要是给TTSManager提供回调
      * @param requestContent
      * @param index
      */
     void onAudioRequestSuccess(String requestContent, int index);
 
-
+    /**
+     * 合成数据失败的回调，主要是给TTSManager提供回调
+     *
+     *
+     */
+    void onAudioRequestFailed(String errorInfo);
 
 
 }

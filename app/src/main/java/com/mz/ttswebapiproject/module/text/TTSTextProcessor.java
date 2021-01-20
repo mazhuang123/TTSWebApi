@@ -1,12 +1,6 @@
 package com.mz.ttswebapiproject.module.text;
 
-import android.graphics.Color;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-
 import com.mz.ttswebapiproject.bean.TextConfig;
-import com.mz.ttswebapiproject.listener.TTSTextProcessorListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +18,7 @@ public class TTSTextProcessor {
      */
     private static final String SEPARATOR_REGEX = "[,.?!，。？！;；]";
     List<TextConfig> textConfigList;
-    private TTSTextProcessorListener ttsTextProcessorListener;
 
-    public TTSTextProcessor(TTSTextProcessorListener ttsTextProcessorListener) {
-        this.ttsTextProcessorListener = ttsTextProcessorListener;
-    }
 
     private String[] executeSplit(String content) {
         String[] strings = splitSentence(content);
@@ -114,17 +104,6 @@ public class TTSTextProcessor {
             textConfigList.add(textConfig);
         }
         return textConfigList;
-    }
-    public List<TextConfig> getTextConfigList(){
-        return textConfigList;
-    }
-    public void fillPlayTextColor(String originalText,TextConfig textConfig){
-        SpannableString spannableString = new SpannableString(originalText);
-        spannableString.setSpan(new ForegroundColorSpan(Color.parseColor("#C75450"))
-                , textConfig.getParaStart()
-                , textConfig.getParaEnd()
-                , Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        ttsTextProcessorListener.onTTSProcessorColorChange(spannableString);
     }
 }
 
