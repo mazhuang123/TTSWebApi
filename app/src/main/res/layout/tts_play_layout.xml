@@ -2,8 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
+    <LinearLayout
+        android:id="@+id/pre_layout"
+        android:gravity="center"
+        android:layout_width="50dp"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/tts_listen_book_pre_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
     <FrameLayout
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
@@ -27,4 +41,15 @@
             android:background="@drawable/listen_play_icon"
             android:focusable="false" />
     </FrameLayout>
+    <LinearLayout
+        android:id="@+id/next_layout"
+        android:gravity="center"
+        android:layout_width="50dp"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/tts_listen_book_next_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 </LinearLayout>

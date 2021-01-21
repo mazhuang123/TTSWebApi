@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.mz.ttswebapiproject.R;
 import com.mz.ttswebapiproject.config.Config;
+import com.mz.ttswebapiproject.config.PlayState;
 import com.mz.ttswebapiproject.dialogfragment.EngineTypeDialogFragment;
 import com.mz.ttswebapiproject.dialogfragment.FormatDialogFragment;
 import com.mz.ttswebapiproject.dialogfragment.SampleDialogFragment;
@@ -20,7 +22,6 @@ import com.mz.ttswebapiproject.listener.TTSManagerListener;
 import com.mz.ttswebapiproject.listener.TTSSpeedListener;
 import com.mz.ttswebapiproject.manager.TTSDataKeeper;
 import com.mz.ttswebapiproject.manager.TTSManager;
-import com.mz.ttswebapiproject.util.LogUtil;
 import com.mz.ttswebapiproject.util.ToastUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,7 +41,7 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
     private ProgressBar progressBar;
     private SeekBar progressSeekBar;
     TTSManager ttsContentProcessor;
-
+    private LinearLayout preLayout,nextLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,17 +56,21 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
         sampleBtn = findViewById(R.id.sample_btn);
         formatBtn = findViewById(R.id.format_btn);
         engineBtn = findViewById(R.id.engine_btn);
+        preLayout = findViewById(R.id.pre_layout);
+        nextLayout = findViewById(R.id.next_layout);
         speakerBtn.setOnClickListener(this);
         sampleBtn.setOnClickListener(this);
         formatBtn.setOnClickListener(this);
         startBtn.setOnClickListener(this);
         engineBtn.setOnClickListener(this);
+        preLayout.setOnClickListener(this);
+        nextLayout.setOnClickListener(this);
         progressSeekBar.setOnSeekBarChangeListener(this);
         Button speedBtn = findViewById(R.id.speed_btn);
         speedBtn.setOnClickListener(this);
         TTSDataKeeper.getInstance().setAudioPath(this);
         contentView.setText(Config.getContent());
-        ttsContentProcessor = new TTSManager(Config.getContent());
+        ttsContentProcessor = new TTSManager();
         ttsContentProcessor.addTTSManagerListener(this);
     }
 
@@ -78,6 +83,10 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
                 } else {
                     ttsContentProcessor.changePlayState(true);
                 }
+                break;
+            case R.id.pre_layout:
+                break;
+            case R.id.next_layout:
                 break;
             case R.id.speed_btn:
                 SpeedDialogFragment speedFragment = new SpeedDialogFragment();
@@ -139,29 +148,27 @@ public class TTSActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
-    public void onMediaPlayWait() {
-        setPlayState(true,true);
+    public void onManagerPlayState(PlayState playState) {
+        switch (playState){
+            case WAIT:
+                setPlayState(true,true);
+                break;
+            case PAUSE:
+                setPlayState(false,false);
+                break;
+            case ERROR:
+                setPlayState(false,true);
+                break;
+            case OVER:
+                setPlayState(false,false);
+                break;
+        }
     }
 
     @Override
-    public void onMediaPlayPause() {
-        setPlayState(false,false);
-    }
-    @Override
-    public void onMediaPlayError(String errorInfo) {
-        setPlayState(false,true);
-    }
-
-    @Override
-    public void onMediaPlayComplete(int index, int sumSize) {
-        float progress = (index+1)*100/sumSize;
+    public void onMediaPlayItemComplete(int index, float progress) {
         playIndexView.setText("已经播放："+index);
         progressSeekBar.setProgress((int) progress);
-    }
-
-    @Override
-    public void onMediaPlayOver() {
-        setPlayState(false,false);
     }
 
     @Override

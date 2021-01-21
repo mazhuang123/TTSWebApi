@@ -7,7 +7,7 @@ import android.text.SpannableString;
  * @Date 创建时间：2020/12/22 10:38
  * @Description 文件描述：
  */
-public class TextConfig {
+public class SentenceInfo {
     private String content;
     private int index;//某句话在分割后生成的数组中占的位置
     private int paraStart;

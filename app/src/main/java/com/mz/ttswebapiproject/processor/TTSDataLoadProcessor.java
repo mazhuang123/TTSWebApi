@@ -1,6 +1,6 @@
 package com.mz.ttswebapiproject.processor;
 
-import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.bean.SentenceInfo;
 import com.mz.ttswebapiproject.config.Config;
 import com.mz.ttswebapiproject.listener.TTSDataLoadListener;
 import com.mz.ttswebapiproject.listener.TTSDataLoadProcessorListener;
@@ -19,19 +19,19 @@ import java.util.List;
 public class TTSDataLoadProcessor implements TTSDataLoadListener {
     private int currentIndex;//当前正在请求的索引
     private DataSynthesizer dataSynthesizer;
-    private List<TextConfig> textConfigList;
+    private List<SentenceInfo> sentenceInfoList;
     private SynthesizerCreateFactory synthesizerCreateFactory;
     private TTSDataLoadProcessorListener ttsDataLoadProcessorListener;
 
     public TTSDataLoadProcessor() {
-        textConfigList = new ArrayList<>();
+        sentenceInfoList = new ArrayList<>();
         synthesizerCreateFactory = new SynthesizerCreateFactory();
         dataSynthesizer = synthesizerCreateFactory.createSynthesizer(Config.ENGINE_TYPE_HTTP);
         dataSynthesizer.addTTSDataLoadListener(this);
     }
 
-    public void loadTextData(List<TextConfig> configs) {
-        textConfigList.addAll(configs);
+    public void loadTextData(List<SentenceInfo> configs) {
+        sentenceInfoList.addAll(configs);
     }
 
     /**
@@ -67,12 +67,12 @@ public class TTSDataLoadProcessor implements TTSDataLoadListener {
             return;
         }
         if (dataSynthesizer != null) {
-            dataSynthesizer.synthesizeStart(textConfigList.get(currentIndex).getContent(), currentIndex);
+            dataSynthesizer.synthesizeStart(sentenceInfoList.get(currentIndex).getContent(), currentIndex);
         }
     }
 
     public boolean isLimited() {
-        if (currentIndex < textConfigList.size()) {
+        if (currentIndex < sentenceInfoList.size()) {
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class TTSDataLoadProcessor implements TTSDataLoadListener {
     @Override
     public void onDataLoadSuccess(String requestContent, int index, ArrayList<byte[]> resultBytes) {
         FileOperator.getInstance().saveFileIntoLocal(index, resultBytes);
-        ttsDataLoadProcessorListener.onAudioRequestSuccess(requestContent, index);
+        ttsDataLoadProcessorListener.onAudioRequestSuccess(requestContent, index, sentenceInfoList.get(index));
         index++;
         if (FileOperator.getInstance().loadFileFromMap(index) == null || !FileOperator.getInstance().loadFileFromMap(index).exists()) {
             requestNext();

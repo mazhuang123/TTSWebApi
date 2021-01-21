@@ -6,9 +6,11 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
 import com.mz.ttswebapiproject.R;
-import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.bean.SentenceInfo;
+import com.mz.ttswebapiproject.config.PlayState;
 import com.mz.ttswebapiproject.listener.TTSManagerListener;
 import com.mz.ttswebapiproject.listener.TTSPlayProcessorListener;
+import com.mz.ttswebapiproject.listener.TTSSentenceInfoLoadListener;
 import com.mz.ttswebapiproject.processor.TTSDataLoadProcessor;
 import com.mz.ttswebapiproject.listener.TTSDataLoadProcessorListener;
 import com.mz.ttswebapiproject.module.text.TTSTextProcessor;
@@ -17,7 +19,6 @@ import com.mz.ttswebapiproject.ui.MyApplication;
 import com.mz.ttswebapiproject.util.FileOperator;
 import com.mz.ttswebapiproject.util.LogUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,26 +26,22 @@ import java.util.List;
  * @Date 创建时间：2020/12/21 11:53
  * @Description 文件描述：中间处理类
  */
-public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcessorListener {
+public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcessorListener , TTSSentenceInfoLoadListener {
     private TTSDataLoadProcessor ttsDataLoadProcessor;
     private TTSPlayProcessor ttsPlayProcessor;
-    private String originalText;
     private TTSTextProcessor textProcessor;
-    private List<TextConfig> textConfigList = new ArrayList<>();
     private int fileNoExistIndex = -1;
+    private boolean isStart = true;
+    private boolean isResume;
     private SpannableString spannableString;
     private ForegroundColorSpan playSpan;
     private BackgroundColorSpan requestSpan;
-    private TextConfig requestTextConfig, playTextConfig;
+    private SentenceInfo requestSentenceInfo, playSentenceInfo;
     private TTSManagerListener ttsManagerListener;
 
-    public TTSManager(String content) {
-        this.originalText = content;
-        requestTextConfig = new TextConfig();
-        playTextConfig = new TextConfig();
-        spannableString = new SpannableString(originalText);
-        playSpan = new ForegroundColorSpan(MyApplication.getContext().getResources().getColor(R.color.blue));
-        requestSpan = new BackgroundColorSpan(MyApplication.getContext().getResources().getColor(R.color.yellow));
+    public TTSManager() {
+        requestSentenceInfo = new SentenceInfo();
+        playSentenceInfo = new SentenceInfo();
         init();
     }
 
@@ -56,18 +53,24 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
 
     public void initTextProcessor() {
         textProcessor = new TTSTextProcessor();
-        textConfigList.addAll(textProcessor.computeParaPosition(originalText));
+        textProcessor.addTTSSentenceInfoLoadListener(this);
     }
-
+    @Override
+    public void obtainSentenceInfo(List<SentenceInfo> configs,String content) {
+        spannableString = new SpannableString(content);
+        playSpan = new ForegroundColorSpan(MyApplication.getContext().getResources().getColor(R.color.blue));
+        requestSpan = new BackgroundColorSpan(MyApplication.getContext().getResources().getColor(R.color.yellow));
+        ttsDataLoadProcessor.loadTextData(configs);
+        ttsPlayProcessor.loadTextData(configs);
+        ttsPlayProcessor.playCurrent();
+    }
     public void initDataLoadProcessor() {
         ttsDataLoadProcessor = new TTSDataLoadProcessor();
-        ttsDataLoadProcessor.loadTextData(textConfigList);
         ttsDataLoadProcessor.addTTSHttpProcessorListener(this);
     }
 
     public void initTTSPlayProcessor() {
         ttsPlayProcessor = new TTSPlayProcessor();
-        ttsPlayProcessor.loadTextData(textConfigList);
         ttsPlayProcessor.addTTSPlayProcessorListener(this);
 
     }
@@ -83,8 +86,8 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
 
 
     @Override
-    public void onAudioRequestSuccess(String requestContent, int index) {
-        requestTextConfig = textConfigList.get(index);
+    public void onAudioRequestSuccess(String requestContent, int index, SentenceInfo sentenceInfo) {
+        requestSentenceInfo = sentenceInfo;
         ttsManagerListener.onManagerAudioRequestProgress(index);
         fillTextColor();
         LogUtil.play("缓存完了：" + index);
@@ -101,8 +104,8 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
     }
 
     private void fillTextColor() {
-        spannableString.setSpan(playSpan, 0, playTextConfig.getParaEnd(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        spannableString.setSpan(requestSpan, 0, requestTextConfig.getParaEnd(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(playSpan, 0, playSentenceInfo.getParaEnd(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(requestSpan, 0, requestSentenceInfo.getParaEnd(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         ttsManagerListener.onTextColorChange(spannableString);
     }
 
@@ -128,7 +131,12 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
     public void changePlayState(boolean shouldPlay) {
         if (shouldPlay) {
             contentProcessorIsPlaying();
-            ttsPlayProcessor.playCurrent();
+            if(isStart){
+                textProcessor.requestPageData("123");
+                isStart = false;
+            } else {
+                ttsPlayProcessor.playCurrent();
+            }
         } else {
             contentProcessorPause();
         }
@@ -164,16 +172,7 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
     }
 
     public void updateReadProgress(int progress) {
-        int wordIndex = (originalText.length() - 1) * progress / 100;
-        LogUtil.e("拖动到某个字的索引是：" + wordIndex);
-        boolean isInLimited = false;
-        for (TextConfig textConfig : textConfigList) {
-            if (wordIndex >= textConfig.getParaStart() && wordIndex <= textConfig.getParaEnd()) {
-                int currentPlayIndex = textConfigList.indexOf(textConfig);
-                ttsPlayProcessor.playResume(currentPlayIndex);
-                break;
-            }
-        }
+        ttsPlayProcessor.seekToPlayProress(progress);
     }
 
     public void addTTSManagerListener(TTSManagerListener ttsManagerListener) {
@@ -186,7 +185,7 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
 
     @Override
     public void onPlayProcessorFileNotFound(int index) {
-        ttsManagerListener.onMediaPlayWait();
+        ttsManagerListener.onManagerPlayState(PlayState.WAIT);
         fileNoExistIndex = index;
         LogUtil.play("文件不存在" + index);
         //todo 判断是否该重新请求数据
@@ -194,39 +193,20 @@ public class TTSManager implements TTSDataLoadProcessorListener, TTSPlayProcesso
     }
 
     @Override
-    public void onPlayProcessorError(int index, String errorInfo) {
-        ttsManagerListener.onMediaPlayError(errorInfo);
+    public void onPlayProcessorState(PlayState playState, int index) {
+        ttsManagerListener.onManagerPlayState(playState);
     }
-
-
     @Override
-    public void onPlayProcessorPause(int index) {
-        ttsManagerListener.onMediaPlayPause();
-    }
-
-    @Override
-    public void onPlayProcessorStop(int index) {
-
+    public void onPlayProcessorItemCompletion(int index, float progress) {
+        ttsManagerListener.onMediaPlayItemComplete(index, progress);
     }
 
     @Override
-    public void onPlayProcessorCompletion(int index) {
-        ttsManagerListener.onMediaPlayComplete(index, textConfigList.size());
-    }
-
-    @Override
-    public void onPlayProcessorPlaying(int index, boolean isPlaying) {
-        playTextConfig = textConfigList.get(index);
+    public void onPlayProcessorPlaying(int index, boolean isPlaying, SentenceInfo sentenceInfo) {
+        playSentenceInfo = sentenceInfo;
         fillTextColor();
     }
 
-    @Override
-    public void onPlayerProcessorPlayState(int index, boolean isPlaying) {
 
-    }
 
-    @Override
-    public void onPlayProcessorOver() {
-        ttsManagerListener.onMediaPlayOver();
-    }
 }

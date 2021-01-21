@@ -1,10 +1,10 @@
 package com.mz.ttswebapiproject.processor;
 
-import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.bean.SentenceInfo;
+import com.mz.ttswebapiproject.config.PlayState;
 import com.mz.ttswebapiproject.listener.TTSMediaPlayerModuleListener;
 import com.mz.ttswebapiproject.listener.TTSPlayProcessorListener;
 import com.mz.ttswebapiproject.module.play.mediaplay.TTSMediaPlayerModule;
-import com.mz.ttswebapiproject.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +17,13 @@ import java.util.List;
 public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
     private TTSMediaPlayerModule ttsMediaPlayerModule;
     private TTSPlayProcessorListener ttsPlayProcessorListener;
-    private List<TextConfig> textConfigList;
+    private List<SentenceInfo> sentenceInfoList;
     private int currentIndex;
     private boolean mIsPlaying;
     public TTSPlayProcessor() {
         ttsMediaPlayerModule = new TTSMediaPlayerModule();
         ttsMediaPlayerModule.addTTSAudioPlayerListener(this);
-        textConfigList = new ArrayList<>();
+        sentenceInfoList = new ArrayList<>();
     }
     public void addTTSPlayProcessorListener(TTSPlayProcessorListener ttsPlayProcessorListener){
         this.ttsPlayProcessorListener = ttsPlayProcessorListener;
@@ -31,8 +31,8 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
     public void removeTTSPlayProcessorListener(){
         this.ttsPlayProcessorListener = null;
     }
-    public void loadTextData(List<TextConfig> configs){
-        textConfigList.addAll(configs);
+    public void loadTextData(List<SentenceInfo> configs){
+        sentenceInfoList.addAll(configs);
     }
     /**
      * 仅限从第0个播放
@@ -54,7 +54,7 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
         if(isLimited()){
             play();
         } else {
-            ttsPlayProcessorListener.onPlayProcessorOver();
+            ttsPlayProcessorListener.onPlayProcessorState(PlayState.OVER,currentIndex);
         }
     }
 
@@ -65,7 +65,7 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
         if(isLimited()){
             play();
         } else {
-            ttsPlayProcessorListener.onPlayProcessorOver();
+            ttsPlayProcessorListener.onPlayProcessorState(PlayState.OVER,currentIndex);
         }
     }
     public void play(){
@@ -79,13 +79,15 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
         if(isLimited()){
             ttsMediaPlayerModule.startPlay(currentIndex);
         } else {
-            ttsPlayProcessorListener.onPlayProcessorOver();
+            ttsPlayProcessorListener.onPlayProcessorState(PlayState.OVER,currentIndex);
         }
     }
+    public void seekToPlayProress(int progress){
 
+    }
 
     public boolean isLimited() {
-        if (currentIndex < textConfigList.size()) {
+        if (currentIndex < sentenceInfoList.size()) {
             return true;
         }
         return false;
@@ -96,7 +98,9 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
 
     public boolean isMediaPlaying(){
          if(ttsMediaPlayerModule!=null){
-              ttsPlayProcessorListener.onPlayerProcessorPlayState(currentIndex,ttsMediaPlayerModule.isPlaying());
+             if(ttsMediaPlayerModule.isPlaying()){
+                 ttsPlayProcessorListener.onPlayProcessorState(PlayState.PLAYING,currentIndex);
+             }
               return ttsMediaPlayerModule.isPlaying();
          }
          return false;
@@ -111,28 +115,28 @@ public class TTSPlayProcessor implements TTSMediaPlayerModuleListener {
 
     @Override
     public void onMediaPlayerError(int index,String errorInfo) {
-        ttsPlayProcessorListener.onPlayProcessorError(index,errorInfo);
+        ttsPlayProcessorListener.onPlayProcessorState(PlayState.ERROR,index);
     }
 
     @Override
     public void onMediaPlayerPause(int index) {
-        ttsPlayProcessorListener.onPlayProcessorPause(index);
+        ttsPlayProcessorListener.onPlayProcessorState(PlayState.PAUSE,index);
     }
 
     @Override
     public void onMediaPlayerStop(int index) {
-        ttsPlayProcessorListener.onPlayProcessorStop(index);
+        ttsPlayProcessorListener.onPlayProcessorState(PlayState.STOP,index);
     }
 
     @Override
-    public void onMediaPlayerCompletion(int index) {
-        ttsPlayProcessorListener.onPlayProcessorCompletion(index);
+    public void onMediaPlayerItemCompletion(int index) {
+        ttsPlayProcessorListener.onPlayProcessorItemCompletion(index,(index*100)/ sentenceInfoList.size());
         playNext();
     }
 
     @Override
     public void onMediaPlayerPlaying(int index,boolean isPlaying) {
-        ttsPlayProcessorListener.onPlayProcessorPlaying(index,isPlaying);
+        ttsPlayProcessorListener.onPlayProcessorPlaying(index,isPlaying, sentenceInfoList.get(index));
     }
 
 }

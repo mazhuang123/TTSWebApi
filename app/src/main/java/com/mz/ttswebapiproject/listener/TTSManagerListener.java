@@ -2,7 +2,7 @@ package com.mz.ttswebapiproject.listener;
 
 import android.text.SpannableString;
 
-import com.mz.ttswebapiproject.bean.TextConfig;
+import com.mz.ttswebapiproject.config.PlayState;
 
 /**
  * @Author 作者：mazhuang
@@ -10,16 +10,9 @@ import com.mz.ttswebapiproject.bean.TextConfig;
  * @Description 文件描述：
  */
 public interface TTSManagerListener {
+    void onManagerPlayState(PlayState playState);
 
-    void onMediaPlayWait();
-
-    void onMediaPlayPause();
-
-    void onMediaPlayError(String errorInfo);
-
-    void onMediaPlayComplete(int index, int sumSize);
-
-    void onMediaPlayOver();
+    void onMediaPlayItemComplete(int index, float progress);
 
     void onTextColorChange(SpannableString spannableString);
 

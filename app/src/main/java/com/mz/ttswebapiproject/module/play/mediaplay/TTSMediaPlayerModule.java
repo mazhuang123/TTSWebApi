@@ -62,7 +62,7 @@ public class TTSMediaPlayerModule {
                     tempMediaPlayer = mediaPlayerMap.get(mediaPlayer.toString());
                     for (TTSMediaPlayerModuleListener audioPlayerListener : ttsAudioPlayerListenerList) {
                         if (audioPlayerListener != null) {
-                            audioPlayerListener.onMediaPlayerCompletion(currentPlayIndex);
+                            audioPlayerListener.onMediaPlayerItemCompletion(currentPlayIndex);
                         }
                     }
                 }

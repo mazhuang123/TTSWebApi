@@ -15,7 +15,7 @@ public interface TTSMediaPlayerModuleListener {
 
     void onMediaPlayerStop(int index);
 
-    void onMediaPlayerCompletion(int index);
+    void onMediaPlayerItemCompletion(int index);
 
     void onMediaPlayerPlaying(int index,boolean isPlaying);
 
