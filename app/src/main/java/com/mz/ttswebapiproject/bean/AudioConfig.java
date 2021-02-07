@@ -14,7 +14,7 @@ public class AudioConfig {
     private String pitch = "50";
     private String engine_type = "intp65";
     private String text_type = "text";
-
+    private String test1;
     public String getAuf() {
         return auf;
     }
